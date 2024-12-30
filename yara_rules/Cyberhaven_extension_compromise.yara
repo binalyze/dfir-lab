@@ -7,6 +7,7 @@ rule Cyberhaven_compromise_extension_pattern {
         author = "SecureAnnex, Binalyze DFIR Lab"
         hash = "1f5675c4fd1265ef85cd80ef3f75a7c0"
         reference = "https://secureannex.com/blog/cyberhaven-extension-compromise/"
+        reference = "https://www.cyberhaven.com/blog/cyberhavens-chrome-extension-security-incident-and-what-were-doing-about-it"
         verdict = "dangerous"
         mitre = "T1176, T1539, T1649"
         platform = "windows"
