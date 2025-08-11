@@ -1,0 +1,45 @@
+id: 7a8b9c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d
+title: Powershell Sensitive Extension Collection
+description: Detects PowerShell commands used to collect specific file types across directories, a common technique used by threat actors for data exfiltration.
+references:
+    - Internal research
+author: Binalyze DFIR Lab
+date: 2025/08/01
+tags:
+    - attack.collection
+    - attack.t1005
+    - attack.t1074.001
+    - attack.exfiltration
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    # warning: The 'data' field used in the detection section is the container for the event data as a whole. You may have to adapt the rule for your backend accordingly
+    selection_ps:
+        Data|contains: '\powershell.exe'
+    selection_getchilditem:
+        Data|contains: 'Get-ChildItem'
+    selection_path_patterns:
+        Data|contains: 'C:\Users\'
+    selection_file_types:
+        Data|contains:
+            - '*.txt'
+            - '*.doc'
+            - '*.xls'
+            - '*.ppt'
+            - '*.pdf'
+            - '*.rdp'
+            - '*.ovpn'
+            - '*.rar'
+            - '*.zip'
+            - '*.7z'
+            - '*.jpg'
+            - '*.jpeg'
+            - '*.png'
+            - '*.csv'
+    selection_recurse:
+        Data|contains: ' -Recurse '
+    selection_include:
+        Data|contains: ' -Include '
+    condition: all of selection_*
+level: high 
