@@ -1,0 +1,54 @@
+title: PHP2Shell Shell Spawned by Linux Web Worker
+id: 11ad1e65-2278-4d35-b2a5-82e0ac71c138
+status: experimental
+description: >-
+    Detects a shell spawned directly by a Linux web server or PHP worker process,
+    which may indicate webshell use or post-exploitation activity following PHP2Shell
+    (CVE-2026-109618, CVE-2026-109619) remote code execution. A match is a hunting
+    lead, not proof of exploitation or of a vulnerable PHP installation.
+author: Binalyze DFIR Lab
+date: 2026/10/22
+references:
+    - https://binalyze.ai/blog/investigating-php2shell-after-patching/
+    - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+    - https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp
+    - https://securitylabs.datadoghq.com/articles/php2shell-critical-vulnerabilities-in-php/
+tags:
+    - attack.execution
+    - attack.t1059.004
+    - attack.persistence
+    - attack.t1505.003
+logsource:
+    category: process_creation
+    product: linux
+detection:
+    selection_parent:
+        ParentImage|endswith:
+            - '/apache2'
+            - '/httpd'
+            - '/php-fpm'
+            - '/php-cgi'
+            - '/lsphp'
+            - '/frankenphp'
+    selection_parent_versioned:
+        ParentImage|re: '/(?:php-fpm|php-cgi|lsphp)[0-9]+(?:\.[0-9]+)*$'
+    selection_shell:
+        Image|endswith:
+            - '/sh'
+            - '/bash'
+            - '/dash'
+            - '/ash'
+            - '/zsh'
+            - '/ksh'
+            - '/busybox'
+    condition: (selection_parent or selection_parent_versioned) and selection_shell
+fields:
+    - ParentImage
+    - Image
+    - CommandLine
+    - User
+    - ProcessId
+    - ParentProcessId
+falsepositives:
+    - Legitimate application command execution, CGI wrappers, and maintenance scripts
+level: medium
